@@ -11,24 +11,24 @@ public class MyMediaRecorder {
     private MediaRecorder mMediaRecorder ;
     public boolean isRecording = false ;
 
-//    public float getMaxAmplitude() {
-//        if (mMediaRecorder != null) {
-//            try {
-//                return mMediaRecorder.getMaxAmplitude();
-//            } catch (IllegalArgumentException e) {
-//                e.printStackTrace();
-//                return 0;
-//            }
-//        } else {
-//            return 5;
-//        }
-//    }
+    public int getMaxAmplitude() {
+        if (mMediaRecorder != null) {
+            try {
+                return mMediaRecorder.getMaxAmplitude();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return 0;
+            }
+        } else {
+            return 5;
+        }
+    }
 
     public File getMyRecAudioFile() {
         return myRecAudioFile;
     }
 
-    public void setMyRecAudioFile(File myRecAudioFile) {
+    public void setMyRecAudioFilel(File myRecAudioFile) {
         this.myRecAudioFile = myRecAudioFile;
     }
 

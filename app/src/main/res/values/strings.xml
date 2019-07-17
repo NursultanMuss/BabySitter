@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">BabySitter</string>
+    <!-- MainActivity.java -->
+    <string name="activity_infobull">This is a custom message box</string>
+    <string name="activity_infotitle">About Decibel</string>
+    <string name="activity_infobutton">Ok</string>
+    <string name="activity_recStartErr">Unable to start recording</string>
+    <string name="activity_recBusyErr">Recorder is busy or permission to record is prohibited</string>
+    <string name="activity_recFileErr">Can not create file</string>
 </resources>
