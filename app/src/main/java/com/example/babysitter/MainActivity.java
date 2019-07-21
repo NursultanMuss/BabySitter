@@ -2,9 +2,12 @@ package com.example.babysitter;
 
 import android.graphics.Color;
 import android.media.MediaRecorder;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.Window;
 import android.widget.Toast;
 
 
@@ -13,10 +16,13 @@ import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements OnChartGestureListener {
 
@@ -27,11 +33,24 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     private boolean bListener = true; // для проверки записи звука
     boolean stoped=false;  // для кнопки stop
     private BarChart mChart;
+    ArrayList<Entry> yVals;
+
+    final Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if(msg.what == 1){
+
+            }
+        }
+    };
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_main);
 
         mChart = findViewById(R.id.bar_chart);
@@ -131,6 +150,17 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         // limit lines are drawn behind data (and not on top)
         leftAxis.setDrawLimitLinesBehindData(true);
     }
+
+    private void setupData() {
+        yVals = new ArrayList<>();
+        yVals.add(new Entry(0,0));
+        BarData data = new BarData();
+        data.setValueTextColor(Color.WHITE);
+
+        // add empty data
+        mChart.setData(data);
+    }
+
 
     @Override
     public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
