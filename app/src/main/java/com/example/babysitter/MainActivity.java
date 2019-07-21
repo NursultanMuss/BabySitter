@@ -8,6 +8,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -17,9 +19,16 @@ import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,14 +42,21 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     private boolean bListener = true; // для проверки записи звука
     boolean stoped=false;  // для кнопки stop
     private BarChart mChart;
-    ArrayList<Entry> yVals;
+    private boolean isChart;
+    ArrayList<BarEntry> yVals;
+    Button btn_stop;
+    Button btn_start;
+    TextView tv_status;
+
 
     final Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if(msg.what == 1){
-
+                if(!isChart){
+                    initCha
+                }
             }
         }
     };
@@ -49,16 +65,15 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-
         setContentView(R.layout.activity_main);
 
-        mChart = findViewById(R.id.bar_chart);
+        btn_start = findViewById(R.id.btn_start);
+        btn_stop = findViewById(R.id.btn_stop);
+        tv_status = findViewById(R.id.tv_status);
+
+
         setupChart();
         audioRecorder = new MyMediaRecorder();
-//        audioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//        audioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-//        audioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
 
     }
@@ -108,11 +123,28 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         }
     }
 
+    private void initChart(){
+        if(mChart != null){
+            if(mChart.getData() != null &&
+                mChart.getData().getDataSetCount() > 0){
+                isChart = true;
+            }
+        }
+        else{
+            mChart = findViewById(R.id.bar_chart);
+            setupChart();
+            setupAxes();
+
+
+        }
+    }
+
     private void setupChart(){
+        mChart.setViewPortOffsets(50, 20, 5, 60);
         // disable description text
         mChart.getDescription().setEnabled(false);
         // enable touch gestures
-        mChart.setTouchEnabled(false);
+        mChart.setTouchEnabled(true);
         // if disabled, scaling can be done on x- and y-axis separately
         mChart.setPinchZoom(true);
         // enable scaling
@@ -153,14 +185,82 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 
     private void setupData() {
         yVals = new ArrayList<>();
-        yVals.add(new Entry(0,0));
+        yVals.add(new BarEntry(0,0));
         BarData data = new BarData();
         data.setValueTextColor(Color.WHITE);
+
+        BarDataSet set1 = new BarDataSet(yVals, "DataSet 1");
+//            set1.setValueTypeface(tf);
+//        set1.setMode(BarDataSet.Mode.CUBIC_BEZIER);
+//        set1.setCubicIntensity(0.02f);
+//        set1.setDrawFilled(true);
+//        set1.setDrawCircles(false);
+//        set1.setCircleColor(Color.GREEN);
+//        set1.setHighLightColor(Color.rgb(244, 117, 117));
+//        set1.setColor(Color.GREEN);
+//        set1.setFillColor(Color.GREEN);
+//        set1.setFillAlpha(100);
+//        set1.setDrawHorizontalHighlightIndicator(false);
+//            set1.setFillFormatter(new FillFormatter() {
+//                @Override
+//                public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
+//                    return -10;
+//                }
+//            });
+
+        if (mChart.getData() != null &&
+                mChart.getData().getDataSetCount() > 0) {
+            data =  mChart.getBarData();
+            data.clearValues();
+            data.removeDataSet(0);
+            data.addDataSet(set1);
+        }else {
+            data = new BarData(set1);
+        }
+
+        data.setValueTextSize(9f);
+        data.setDrawValues(false);
+        mChart.setData(data);
+        mChart.getLegend().setEnabled(false);
+        mChart.animateXY(2000, 2000);
+        // dont forget to refresh the drawing
+        mChart.invalidate();
+        isChart=true;
 
         // add empty data
         mChart.setData(data);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        File file = FileUtil.createFile("temp.amr");
+        if(file !=null) {
+            startRecord(file);
+        }else{
+            Toast.makeText(getApplicationContext(), getString(R.string.activity_recFileErr), Toast.LENGTH_LONG).show();
+        }
+        bListener= true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bListener=false;
+        audioRecorder.delete();
+        thread = null;
+        isChart= false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(thread !=null){
+            isThreadRun = false;
+            thread = null;
+        }
+        audioRecorder.delete();
+        super.onDestroy();
+    }
 
     @Override
     public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {

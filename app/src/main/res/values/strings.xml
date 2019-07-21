@@ -7,4 +7,5 @@
     <string name="activity_recStartErr">Unable to start recording</string>
     <string name="activity_recBusyErr">Recorder is busy or permission to record is prohibited</string>
     <string name="activity_recFileErr">Can not create file</string>
+    <string name="tv_status">Статус работы приложения</string>
 </resources>

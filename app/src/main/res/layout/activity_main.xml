@@ -29,10 +29,13 @@
             android:text="СТАРТ"
              />
     </LinearLayout>
+
     <TextView
         android:id="@+id/tv_status"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="#000"
+        tools:text="@string/tv_status" />
 
     <LinearLayout
         android:layout_width="match_parent"
