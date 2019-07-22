@@ -24,6 +24,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
@@ -38,10 +39,11 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     private MyMediaRecorder audioRecorder;
     private Thread thread;
     private boolean isThreadRun =true;// для проверки потока
-    private int soundLevel;
+    int soundLevel = 0;
     private boolean bListener = true; // для проверки записи звука
     boolean stoped=false;  // для кнопки stop
     private BarChart mChart;
+    long savedTime=0;
     private boolean isChart;
     ArrayList<BarEntry> yVals;
     Button btn_stop;
@@ -55,8 +57,10 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             super.handleMessage(msg);
             if(msg.what == 1){
                 if(!isChart){
-                    initCha
+                    initChart();
+                    return;
                 }
+                updateData(soundLevel,0);
             }
         }
     };
@@ -88,6 +92,9 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                     try{
                         if(bListener){
                             soundLevel = audioRecorder.getMaxAmplitude();
+                            Message message = new Message();
+                            message.what = 1;
+                            handler.sendMessage(message);
                         }
                         if(stoped){
                             stoped=false;
@@ -127,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         if(mChart != null){
             if(mChart.getData() != null &&
                 mChart.getData().getDataSetCount() > 0){
+                savedTime++;
                 isChart = true;
             }
         }
@@ -135,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             setupChart();
             setupAxes();
 
-
+            setupData();
         }
     }
 
@@ -155,6 +163,12 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     }
 
     private void setupAxes() {
+        ValueFormatter xAxisFormatter = new ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                return super.getFormattedValue(value);
+            }
+        };
         XAxis xl = mChart.getXAxis();
         xl.setTextColor(Color.WHITE);
         xl.setDrawGridLines(false);
@@ -183,6 +197,25 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         leftAxis.setDrawLimitLinesBehindData(true);
     }
 
+    private void updateData(int val, long time) {
+        if(mChart==null){
+            return;
+        }
+        if (mChart.getData() != null &&
+                mChart.getData().getDataSetCount() > 0) {
+            BarDataSet set1 = (BarDataSet)mChart.getData().getDataSetByIndex(0);
+            set1.setValues(yVals);
+            BarEntry entry=new BarEntry(savedTime,val);
+            set1.addEntry(entry);
+            if(set1.getEntryCount()>200){
+                set1.removeFirst();
+            }
+            mChart.getData().notifyDataChanged();
+            mChart.notifyDataSetChanged();
+            mChart.invalidate();
+            savedTime++;
+        }
+    }
     private void setupData() {
         yVals = new ArrayList<>();
         yVals.add(new BarEntry(0,0));
@@ -208,6 +241,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 //                }
 //            });
 
+
+
         if (mChart.getData() != null &&
                 mChart.getData().getDataSetCount() > 0) {
             data =  mChart.getBarData();
@@ -216,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             data.addDataSet(set1);
         }else {
             data = new BarData(set1);
+            data.setBarWidth(0.9f);
         }
 
         data.setValueTextSize(9f);
@@ -226,9 +262,6 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         // dont forget to refresh the drawing
         mChart.invalidate();
         isChart=true;
-
-        // add empty data
-        mChart.setData(data);
     }
 
     @Override
