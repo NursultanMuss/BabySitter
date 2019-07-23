@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Window;
 import android.widget.Button;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     Button btn_start;
     TextView tv_status;
 
+    public static final String TAG = MainActivity.class.getSimpleName();
+
 
     final Handler handler = new Handler(){
         @Override
@@ -57,9 +60,11 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             super.handleMessage(msg);
             if(msg.what == 1){
                 if(!isChart){
+                    Log.d(TAG,"handler is initChart");
                     initChart();
                     return;
                 }
+                Log.d(TAG,"handler is updateData");
                 updateData(soundLevel,0);
             }
         }
@@ -74,9 +79,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         btn_start = findViewById(R.id.btn_start);
         btn_stop = findViewById(R.id.btn_stop);
         tv_status = findViewById(R.id.tv_status);
-
-
-        setupChart();
+        Log.d(TAG,"onCreate is called");
         audioRecorder = new MyMediaRecorder();
 
 
@@ -92,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                     try{
                         if(bListener){
                             soundLevel = audioRecorder.getMaxAmplitude();
+                            Log.d(TAG,"started Listening audio");
                             Message message = new Message();
                             message.what = 1;
                             handler.sendMessage(message);
@@ -120,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         try{
             audioRecorder.setMyRecAudioFilel(fFile);
             if (audioRecorder.startRecorder()) {
+                Log.d(TAG,"startRecord is called");
                 startListeningAudio();
             }else{
                 Toast.makeText(this, getString(R.string.activity_recStartErr), Toast.LENGTH_SHORT).show();
@@ -136,9 +141,11 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                 mChart.getData().getDataSetCount() > 0){
                 savedTime++;
                 isChart = true;
+                Log.d(TAG,"initChart is not null and have Data");
             }
         }
         else{
+            Log.d(TAG,"initChart is null init chart");
             mChart = findViewById(R.id.bar_chart);
             setupChart();
             setupAxes();
@@ -269,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         super.onResume();
         File file = FileUtil.createFile("temp.amr");
         if(file !=null) {
+            Log.d(TAG,"onResume is called");
             startRecord(file);
         }else{
             Toast.makeText(getApplicationContext(), getString(R.string.activity_recFileErr), Toast.LENGTH_LONG).show();
@@ -281,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         super.onPause();
         bListener=false;
         audioRecorder.delete();
+        Log.d(TAG,"onPause is called");
         thread = null;
         isChart= false;
     }
@@ -291,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             isThreadRun = false;
             thread = null;
         }
+        Log.d(TAG,"onDestroy is called");
         audioRecorder.delete();
         super.onDestroy();
     }

@@ -11,7 +11,7 @@ import java.io.IOException;
 public class FileUtil {
     private static final String TAG = "FileUtil";
 
-    public static final String LOCAL = "SoundMeter";
+    public static final String LOCAL = "BabySitter";
 
     public static final String LOCAL_PATH = Environment.getExternalStorageDirectory().getPath() + File.separator;
 

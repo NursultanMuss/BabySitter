@@ -10,6 +10,7 @@ public class MyMediaRecorder {
     public File myRecAudioFile ;
     private MediaRecorder mMediaRecorder ;
     public boolean isRecording = false ;
+    private final String TAG  = this.getClass().getSimpleName();
 
     public int getMaxAmplitude() {
         if (mMediaRecorder != null) {
