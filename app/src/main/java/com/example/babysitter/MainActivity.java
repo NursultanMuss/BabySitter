@@ -1,9 +1,12 @@
 package com.example.babysitter;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -81,6 +84,12 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         tv_status = findViewById(R.id.tv_status);
         Log.d(TAG,"onCreate is called");
         audioRecorder = new MyMediaRecorder();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED
+        && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+        }
 
 
     }
