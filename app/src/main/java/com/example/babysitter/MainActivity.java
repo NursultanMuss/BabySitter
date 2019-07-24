@@ -1,12 +1,16 @@
 package com.example.babysitter;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +45,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements OnChartGestureListener {
 
     private MyMediaRecorder audioRecorder;
+    private int RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE = 1;
     private Thread thread;
     private boolean isThreadRun =true;// для проверки потока
     int soundLevel = 0;
@@ -85,16 +90,55 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         Log.d(TAG,"onCreate is called");
         audioRecorder = new MyMediaRecorder();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED
-        && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(MainActivity.this,"You have already granted permissions",Toast.LENGTH_SHORT).show();
+        }else{
+            requestRecordAudioPermission();
         }
-
-
     }
 
+    private void requestRecordAudioPermission(){
+        if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.RECORD_AUDIO)
+        && ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+            new AlertDialog.Builder(this)
+                    .setTitle("Permissions needed")
+                    .setMessage(R.string.permissions_explanations)
+                    .setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions(MainActivity.this, new String[]
+                                            {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                                    , RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE);
+                        }
+                    })
+                    .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create().show();
+        }else{
+            ActivityCompat.requestPermissions(this, new String[]
+                    {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                    , RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE);
+        }
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                Toast.makeText(this, R.string.permissions_granted, Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, R.string.permissions_denied, Toast.LENGTH_SHORT);
+            }
+        }
+    }
 
     private void startListeningAudio(){
         thread = new Thread(new Runnable() {
@@ -122,7 +166,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                 }
             }
         });
-        thread.run();
+        thread.start();
     }
 
     /**
@@ -283,6 +327,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     @Override
     protected void onResume() {
         super.onResume();
+
         File file = FileUtil.createFile("temp.amr");
         if(file !=null) {
             Log.d(TAG,"onResume is called");
