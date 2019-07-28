@@ -2,6 +2,8 @@ package com.example.babysitter;
 
 
 import android.media.MediaRecorder;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,14 +41,15 @@ public class MyMediaRecorder {
      */
     public boolean startRecorder(){
         if (myRecAudioFile == null) {
+            Log.d(TAG, "myRecAudioFile is null");
             return false;
         }
         try {
             mMediaRecorder = new MediaRecorder();
 
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
             mMediaRecorder.setOutputFile(myRecAudioFile.getAbsolutePath());
 
             mMediaRecorder.prepare();
@@ -58,12 +61,14 @@ public class MyMediaRecorder {
             mMediaRecorder.release();
             mMediaRecorder = null;
             isRecording = false ;
+            Log.d(TAG, "returned false. IOException");
             exception.printStackTrace();
         }catch(IllegalStateException e){
             stopRecording();
             e.printStackTrace();
             isRecording = false ;
         }
+        Log.d(TAG, "returned false. IllegalStateException");
         return false;
     }
 
@@ -82,6 +87,8 @@ public class MyMediaRecorder {
             }
             mMediaRecorder = null;
             isRecording = false ;
+        }else{
+            return;
         }
     }
 
@@ -93,6 +100,8 @@ public class MyMediaRecorder {
         if (myRecAudioFile != null) {
             myRecAudioFile.delete();
             myRecAudioFile = null;
+        }else{
+            return;
         }
     }
 }

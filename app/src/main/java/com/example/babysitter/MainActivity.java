@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
@@ -156,7 +157,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                         if(stoped){
                             stoped=false;
                             throw new InterruptedException();
-
+                        }else{
+                            Thread.sleep(100);
                         }
                     }
                     catch (InterruptedException e) {
@@ -229,17 +231,17 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                 return super.getFormattedValue(value);
             }
         };
-        XAxis xl = mChart.getXAxis();
-        xl.setTextColor(Color.WHITE);
-        xl.setDrawGridLines(false);
-        xl.setAvoidFirstLastClipping(true);
-        xl.setEnabled(true);
+        mChart.getXAxis().setEnabled(false);
+//        xl.setTextColor(Color.WHITE);
+//        xl.setDrawGridLines(false);
+//        xl.setAvoidFirstLastClipping(true);
+//        xl.setEnabled(true);
 
         YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.setTextColor(Color.WHITE);
-//        leftAxis.setAxisMaximum(TOTAL_MEMORY);
-        leftAxis.setAxisMinimum(0f);
-        leftAxis.setDrawGridLines(true);
+//        leftAxis.setTextColor(Color.WHITE);
+////        leftAxis.setAxisMaximum(TOTAL_MEMORY);
+//        leftAxis.setAxisMinimum(0f);
+//        leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = mChart.getAxisRight();
         rightAxis.setEnabled(false);
@@ -324,6 +326,29 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         isChart=true;
     }
 
+    public void stopClick(View v){
+        isThreadRun = false;
+        bListener= false;
+        audioRecorder.delete();
+        Log.d(TAG,"stopClick is called");
+        thread = null;
+        isChart = false;
+        stoped = true;
+    }
+    public void startClick(View v){
+        File file = FileUtil.createFile("temp.amr");
+        if(file !=null) {
+            Log.d(TAG,"onResume is called");
+            startRecord(file);
+        }else{
+            Toast.makeText(getApplicationContext(), getString(R.string.activity_recFileErr), Toast.LENGTH_LONG).show();
+        }
+        bListener= true;
+        stoped = false;
+        isThreadRun = true;
+
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -337,6 +362,11 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         }
         bListener= true;
     }
+
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//    }
 
     @Override
     protected void onPause() {

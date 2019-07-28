@@ -18,6 +18,7 @@
             android:id="@+id/btn_stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:onClick="stopClick"
             android:text="СТОП"
              />
 
@@ -26,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
+            android:onClick="startClick"
             android:text="СТАРТ"
              />
     </LinearLayout>
