@@ -59,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     Button btn_stop;
     Button btn_start;
     TextView tv_status;
+    View v_limit_line;
+    float dY;
+
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -88,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         btn_start = findViewById(R.id.btn_start);
         btn_stop = findViewById(R.id.btn_stop);
         tv_status = findViewById(R.id.tv_status);
+        v_limit_line = findViewById(R.id.limit_line_view);
         Log.d(TAG,"onCreate is called");
         audioRecorder = new MyMediaRecorder();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -99,6 +103,31 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         }else{
             requestRecordAudioPermission();
         }
+
+
+        v_limit_line.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+//                final int X = (int) event.getRawX();
+//                final int Y = (int) event.getRawY();
+                switch(event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+
+                        dY = v.getY() - event.getRawY();
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        v.animate()
+                                .y(event.getRawY() + dY)
+                                .setDuration(0)
+                                .start();
+                        break;
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        });
     }
 
     private void requestRecordAudioPermission(){
@@ -214,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         // disable description text
         mChart.getDescription().setEnabled(false);
         // enable touch gestures
-        mChart.setTouchEnabled(true);
+        mChart.setTouchEnabled(false);
         // if disabled, scaling can be done on x- and y-axis separately
         mChart.setPinchZoom(true);
         // enable scaling
@@ -238,25 +267,36 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 //        xl.setEnabled(true);
 
         YAxis leftAxis = mChart.getAxisLeft();
+
+
 //        leftAxis.setTextColor(Color.WHITE);
 ////        leftAxis.setAxisMaximum(TOTAL_MEMORY);
-//        leftAxis.setAxisMinimum(0f);
+        leftAxis.setAxisMinimum(0f);
 //        leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = mChart.getAxisRight();
         rightAxis.setEnabled(false);
 
         // Add a limit line
-        LimitLine ll = new LimitLine(590, "Upper Limit");
-        ll.setLineWidth(2f);
-        ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
-        ll.setTextSize(10f);
-        ll.setTextColor(Color.WHITE);
-        // reset all limit lines to avoid overlapping lines
-        leftAxis.removeAllLimitLines();
-        leftAxis.addLimitLine(ll);
-        // limit lines are drawn behind data (and not on top)
-        leftAxis.setDrawLimitLinesBehindData(true);
+//         LimitLine ll = new LimitLine(590, "Upper Limit");
+//        ll.setLineWidth(2f);
+//        ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+//        ll.setTextSize(10f);
+//        ll.setTextColor(Color.WHITE);
+//        leftAxis.setAxisMaximum(ll.getLimit()*1.43f);
+//        // reset all limit lines to avoid overlapping lines
+//        leftAxis.removeAllLimitLines();
+//        leftAxis.addLimitLine(ll);
+//        // limit lines are drawn behind data (and not on top)
+//        leftAxis.setDrawLimitLinesBehindData(true);
+//        ll.setL
+    }
+//    public YAxis.AxisDependency getAxisDependency(){
+//
+//    }
+    public float setYAxisMax(){
+
+        return 10000.0f;
     }
 
     private void updateData(int val, long time) {
@@ -269,6 +309,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             set1.setValues(yVals);
             BarEntry entry=new BarEntry(savedTime,val);
             set1.addEntry(entry);
+            set1.setAxisDependency(YAxis.AxisDependency.LEFT);
             if(set1.getEntryCount()>200){
                 set1.removeFirst();
             }
@@ -348,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         isThreadRun = true;
 
     }
+
 
     @Override
     protected void onResume() {
