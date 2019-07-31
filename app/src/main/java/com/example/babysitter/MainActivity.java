@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.constraint.Group;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -87,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         btn_start = findViewById(R.id.btn_start);
         btn_stop = findViewById(R.id.btn_stop);
         tv_status = findViewById(R.id.tv_status);

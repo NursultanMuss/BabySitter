@@ -7,5 +7,16 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="AppTheme.RedButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorRed</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:padding">14sp</item>
+        <item name="android:radius">8dp </item>
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
+    <style name="AppTheme.GreenButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorGreen</item>
+        <item name="android:textColor">@color/colorWhite</item>
+    </style>
 
 </resources>

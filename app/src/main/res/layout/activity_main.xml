@@ -8,43 +8,57 @@
     tools:context=".MainActivity">
 
 
-    <Button
-        android:id="@+id/btn_stop"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/group_of_btn"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginStart="32dp"
-        android:layout_marginLeft="32dp"
-        android:onClick="stopClick"
-        android:text="СТОП"
-        app:layout_constraintBaseline_toBaselineOf="@+id/btn-start"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btn-start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:layout_marginTop="47dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
-        android:onClick="startClick"
-        android:text="СТАРТ"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:paddingTop="30dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="10dp">
+
+        <Button
+            android:id="@+id/btn_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="right"
+            android:layout_marginStart="32dp"
+            android:layout_marginLeft="32dp"
+            android:onClick="stopClick"
+            android:text="СТОП"
+            android:theme="@style/AppTheme.RedButton"/>
+        <Button
+            android:id="@+id/btn-start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_gravity="right"
+            android:onClick="startClick"
+            android:background="@color/colorGreen"
+            android:text="СТАРТ" />
+
+
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tv_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:textColor="#000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_stop"
+        app:layout_constraintTop_toBottomOf="@+id/group_of_btn"
         tools:text="@string/tv_status" />
-
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/bar_chart"
@@ -64,13 +78,20 @@
     <View
         android:id="@+id/limit_line_view"
         android:layout_width="match_parent"
-        android:layout_height="10sp"
+        android:layout_height="12sp"
+        android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:layout_marginBottom="64dp"
         android:background="@android:color/black"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.411"
-        tools:layout_editor_absoluteX="43dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_status"
+        app:layout_constraintVertical_bias="0.31" />
 
 
 </android.support.constraint.ConstraintLayout>
