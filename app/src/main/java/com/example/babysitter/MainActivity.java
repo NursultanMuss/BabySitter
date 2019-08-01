@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                         Ys.add(event.getRawY() + dY);
                         break;
                     case MotionEvent.ACTION_UP:
+                        v.animate().y(Ys.get(0)).setDuration(0).start();
                         Y1=event.getY();
                         tv_status.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
                         Ys.clear();
