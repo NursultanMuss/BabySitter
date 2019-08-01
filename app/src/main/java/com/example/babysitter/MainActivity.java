@@ -43,6 +43,7 @@ import com.github.mikephil.charting.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnChartGestureListener {
 
@@ -62,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     TextView tv_status;
     View v_limit_line;
     float dY;
+    float  Y1, Yc;
+    List<Float> Ys;
 
 
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -94,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         v_limit_line = findViewById(R.id.limit_line_view);
         Log.d(TAG,"onCreate is called");
         audioRecorder = new MyMediaRecorder();
+        Ys= new ArrayList<>();
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -108,12 +112,15 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         v_limit_line.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-//                final int X = (int) event.getRawX();
-//                final int Y = (int) event.getRawY();
+
                 switch(event.getAction()){
                     case MotionEvent.ACTION_DOWN:
 
                         dY = v.getY() - event.getRawY();
+                        Log.d("Yoyo", "dY = " + dY);
+                        Log.d("Yoyo", "Y = " + v.getY());
+                        Log.d("Yoyo", "rawY = " + event.getRawY());
+                        Ys.add(v.getY());
                         break;
 
                     case MotionEvent.ACTION_MOVE:
@@ -121,10 +128,20 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                                 .y(event.getRawY() + dY)
                                 .setDuration(0)
                                 .start();
+                        Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
+                        Ys.add(event.getRawY() + dY);
                         break;
+                    case MotionEvent.ACTION_UP:
+                        Y1=event.getY();
+                        tv_status.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+                        Ys.clear();
+
                     default:
                         return false;
                 }
+
+                Log.d("Yoyo", "Yc = " + Yc +"\n" + "Y1 =" + Y1);
+
                 return true;
             }
         });
