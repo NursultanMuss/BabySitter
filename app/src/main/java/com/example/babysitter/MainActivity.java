@@ -34,6 +34,7 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
@@ -95,6 +96,11 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         btn_stop = findViewById(R.id.btn_stop);
         tv_status = findViewById(R.id.tv_status);
         v_limit_line = findViewById(R.id.limit_line_view);
+        View v_limit_line_big = findViewById(R.id.limit_line_big);
+        final TextView tv_limit_value = findViewById(R.id.limit_value);
+        final TextView tv_limit_value_chgble = findViewById(R.id.limit_value_chgble);
+        final View v_limit_line_chgble = findViewById(R.id.limit_line_chgble);
+
         Log.d(TAG,"onCreate is called");
         audioRecorder = new MyMediaRecorder();
         Ys= new ArrayList<>();
@@ -109,34 +115,44 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         }
 
 
-        v_limit_line.setOnTouchListener(new View.OnTouchListener() {
+        v_limit_line_big.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
                 switch(event.getAction()){
                     case MotionEvent.ACTION_DOWN:
-
-                        dY = v.getY() - event.getRawY();
+                        v_limit_line_chgble.setVisibility(View.VISIBLE);
+                        tv_limit_value_chgble.setVisibility(View.VISIBLE);
+                        dY = v_limit_line_chgble.getY() - event.getRawY();
                         Log.d("Yoyo", "dY = " + dY);
                         Log.d("Yoyo", "Y = " + v.getY());
                         Log.d("Yoyo", "rawY = " + event.getRawY());
-                        Ys.add(v.getY());
+                        Ys.add(v_limit_line_chgble.getY());
                         break;
-
                     case MotionEvent.ACTION_MOVE:
-                        v.animate()
+                        v_limit_line_chgble.animate()
                                 .y(event.getRawY() + dY)
                                 .setDuration(0)
                                 .start();
+                        tv_limit_value_chgble.animate()
+                            .y(event.getRawY() + dY - 50)
+                            .setDuration(0)
+                            .start();
                         Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
                         Ys.add(event.getRawY() + dY);
+                        tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
                         break;
                     case MotionEvent.ACTION_UP:
-                        v.animate().y(Ys.get(0)).setDuration(0).start();
+                        v_limit_line_chgble.animate()
+                                .y(Ys.get(0))
+                                .setDuration(0)
+                                .start();
+                        v_limit_line_chgble.setVisibility(View.INVISIBLE);
+                        tv_limit_value_chgble.setVisibility(View.INVISIBLE);
+                        tv_limit_value.setText(tv_limit_value_chgble.getText());
                         Y1=event.getY();
-                        tv_status.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
-                        Ys.clear();
 
+                        Ys.clear();
                     default:
                         return false;
                 }
@@ -146,6 +162,39 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                 return true;
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+    }
+
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bListener=false;
+        audioRecorder.delete();
+        Log.d(TAG,"onPause is called");
+        thread = null;
+        isChart= false;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(thread !=null){
+            isThreadRun = false;
+            thread = null;
+        }
+        Log.d(TAG,"onDestroy is called");
+        audioRecorder.delete();
+        super.onDestroy();
     }
 
     private void requestRecordAudioPermission(){
@@ -268,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         mChart.setScaleEnabled(false);
         mChart.setDrawGridBackground(false);
         // set an alternative background color
-        mChart.setBackgroundColor(Color.DKGRAY);
+//        mChart.setBackgroundColor(Color.DKGRAY);
     }
 
     private void setupAxes() {
@@ -278,7 +327,12 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                 return super.getFormattedValue(value);
             }
         };
-        mChart.getXAxis().setEnabled(false);
+
+        XAxis xAxis = mChart.getXAxis();
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xAxis.setDrawAxisLine(false);
+        xAxis.setDrawGridLines(false);
+
 //        xl.setTextColor(Color.WHITE);
 //        xl.setDrawGridLines(false);
 //        xl.setAvoidFirstLastClipping(true);
@@ -362,8 +416,6 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 //                }
 //            });
 
-
-
         if (mChart.getData() != null &&
                 mChart.getData().getDataSetCount() > 0) {
             data =  mChart.getBarData();
@@ -378,12 +430,16 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         data.setValueTextSize(9f);
         data.setDrawValues(false);
         mChart.setData(data);
+//        mChart.setVisibleXRange(1,20);
+//        mChart.setVisibleYRange(1,10, );
         mChart.getLegend().setEnabled(false);
         mChart.animateXY(2000, 2000);
         // dont forget to refresh the drawing
         mChart.invalidate();
         isChart=true;
     }
+
+//    public class MyValueFormatter implements IValueFormatter
 
     public void stopClick(View v){
         isThreadRun = false;
@@ -409,45 +465,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
 
-        File file = FileUtil.createFile("temp.amr");
-        if(file !=null) {
-            Log.d(TAG,"onResume is called");
-            startRecord(file);
-        }else{
-            Toast.makeText(getApplicationContext(), getString(R.string.activity_recFileErr), Toast.LENGTH_LONG).show();
-        }
-        bListener= true;
-    }
-
-//    @Override
-//    protected void onRestart() {
-//        super.onRestart();
-//    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        bListener=false;
-        audioRecorder.delete();
-        Log.d(TAG,"onPause is called");
-        thread = null;
-        isChart= false;
-    }
-
-    @Override
-    protected void onDestroy() {
-        if(thread !=null){
-            isThreadRun = false;
-            thread = null;
-        }
-        Log.d(TAG,"onDestroy is called");
-        audioRecorder.delete();
-        super.onDestroy();
-    }
 
     @Override
     public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
