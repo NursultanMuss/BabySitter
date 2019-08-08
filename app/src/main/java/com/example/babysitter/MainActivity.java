@@ -34,7 +34,9 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.IValueFormatter;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
@@ -99,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         View v_limit_line_big = findViewById(R.id.limit_line_big);
         final TextView tv_limit_value = findViewById(R.id.limit_value);
         final TextView tv_limit_value_chgble = findViewById(R.id.limit_value_chgble);
+        TextView tv_cur_value_chg = findViewById(R.id.curt_value_chgble);
         final View v_limit_line_chgble = findViewById(R.id.limit_line_chgble);
 
         Log.d(TAG,"onCreate is called");
@@ -245,6 +248,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                     try{
                         if(bListener){
                             soundLevel = audioRecorder.getMaxAmplitude();
+
                             Log.d(TAG,"started Listening audio");
                             Message message = new Message();
                             message.what = 1;
@@ -333,6 +337,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(false);
 
+//        xAxis.setValueFormatter(new IndexAxisValueFormatter());
+
 //        xl.setTextColor(Color.WHITE);
 //        xl.setDrawGridLines(false);
 //        xl.setAvoidFirstLastClipping(true);
@@ -382,7 +388,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             BarEntry entry=new BarEntry(savedTime,val);
             set1.addEntry(entry);
             set1.setAxisDependency(YAxis.AxisDependency.LEFT);
-            if(set1.getEntryCount()>200){
+            if(set1.getEntryCount()>50){
                 set1.removeFirst();
             }
             mChart.getData().notifyDataChanged();
@@ -424,13 +430,13 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
             data.addDataSet(set1);
         }else {
             data = new BarData(set1);
-            data.setBarWidth(0.9f);
+            data.setBarWidth(1f);
         }
 
-        data.setValueTextSize(9f);
+//        data.setValueTextSize(20f);
         data.setDrawValues(false);
         mChart.setData(data);
-//        mChart.setVisibleXRange(1,20);
+//        mChart.setVisibleXRange(1,2);
 //        mChart.setVisibleYRange(1,10, );
         mChart.getLegend().setEnabled(false);
         mChart.animateXY(2000, 2000);

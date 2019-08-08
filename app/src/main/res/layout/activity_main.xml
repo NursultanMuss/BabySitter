@@ -132,6 +132,18 @@
         app:layout_constraintBottom_toTopOf="@+id/limit_line_chgble"
         app:layout_constraintStart_toStartOf="@id/bar_chart"
         android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/curt_value_chgble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="TextView12"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/limit_line_chgble"
+        app:layout_constraintEnd_toEndOf="@+id/bar_chart" />
     <View
         android:id="@+id/limit_line_chgble"
         android:layout_width="match_parent"
