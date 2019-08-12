@@ -141,7 +141,7 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="8dp"
         android:text="TextView12"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/limit_line_chgble"
         app:layout_constraintEnd_toEndOf="@+id/bar_chart" />
     <View

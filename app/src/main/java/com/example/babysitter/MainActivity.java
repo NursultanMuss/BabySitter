@@ -46,6 +46,7 @@ import com.github.mikephil.charting.utils.FileUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnChartGestureListener {
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     private Thread thread;
     private boolean isThreadRun =true;// для проверки потока
     int soundLevel = 0;
+    TextView tv_cur_value_chg;
     private boolean bListener = true; // для проверки записи звука
     boolean stoped=false;  // для кнопки stop
     private BarChart mChart;
@@ -66,8 +68,9 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     TextView tv_status;
     View v_limit_line;
     float dY;
-    float  Y1, Yc;
+    float  Y0=0, Yc ;
     List<Float> Ys;
+    List<Integer> yy = new ArrayList<>();
 
 
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -84,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                     return;
                 }
                 Log.d(TAG,"handler is updateData");
+                tv_cur_value_chg.setText(String.valueOf(soundLevel));
+                yy.add(soundLevel);
                 updateData(soundLevel,0);
             }
         }
@@ -101,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         View v_limit_line_big = findViewById(R.id.limit_line_big);
         final TextView tv_limit_value = findViewById(R.id.limit_value);
         final TextView tv_limit_value_chgble = findViewById(R.id.limit_value_chgble);
-        TextView tv_cur_value_chg = findViewById(R.id.curt_value_chgble);
+        tv_cur_value_chg = findViewById(R.id.curt_value_chgble);
         final View v_limit_line_chgble = findViewById(R.id.limit_line_chgble);
 
         Log.d(TAG,"onCreate is called");
@@ -153,14 +158,13 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                         v_limit_line_chgble.setVisibility(View.INVISIBLE);
                         tv_limit_value_chgble.setVisibility(View.INVISIBLE);
                         tv_limit_value.setText(tv_limit_value_chgble.getText());
-                        Y1=event.getY();
+
 
                         Ys.clear();
                     default:
                         return false;
                 }
 
-                Log.d("Yoyo", "Yc = " + Yc +"\n" + "Y1 =" + Y1);
 
                 return true;
             }
@@ -348,24 +352,26 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 
 
 //        leftAxis.setTextColor(Color.WHITE);
-////        leftAxis.setAxisMaximum(TOTAL_MEMORY);
+
         leftAxis.setAxisMinimum(0f);
 //        leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = mChart.getAxisRight();
         rightAxis.setEnabled(false);
 
-        // Add a limit line
-//         LimitLine ll = new LimitLine(590, "Upper Limit");
-//        ll.setLineWidth(2f);
-//        ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
-//        ll.setTextSize(10f);
-//        ll.setTextColor(Color.WHITE);
-//        leftAxis.setAxisMaximum(ll.getLimit()*1.43f);
-//        // reset all limit lines to avoid overlapping lines
-//        leftAxis.removeAllLimitLines();
-//        leftAxis.addLimitLine(ll);
-//        // limit lines are drawn behind data (and not on top)
+//         Add a limit line
+        LimitLine ll = new LimitLine(1500, "Upper Limit");
+        leftAxis.setAxisMaximum(ll.getLimit()*1.43f);
+        ll.setLineWidth(2f);
+        ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
+        ll.setTextSize(10f);
+        ll.setLineColor(Color.GREEN);
+        ll.setTextColor(Color.BLUE);
+
+        // reset all limit lines to avoid overlapping lines
+        leftAxis.removeAllLimitLines();
+        leftAxis.addLimitLine(ll);
+        // limit lines are drawn behind data (and not on top)
 //        leftAxis.setDrawLimitLinesBehindData(true);
 //        ll.setL
     }
@@ -455,6 +461,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         thread = null;
         isChart = false;
         stoped = true;
+        tv_status.setText(String.valueOf(Collections.max(yy)));
+        yy.clear();
     }
     public void startClick(View v){
         File file = FileUtil.createFile("temp.amr");
