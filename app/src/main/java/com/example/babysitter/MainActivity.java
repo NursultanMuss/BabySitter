@@ -8,6 +8,7 @@ import android.media.MediaRecorder;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Group;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +20,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     float  Y0=0, Yc ;
     List<Float> Ys;
     List<Integer> yy = new ArrayList<>();
+    RelativeLayout gr_Button;
+    ConstraintLayout parent;
 
 
     public static final String TAG = MainActivity.class.getSimpleName();
@@ -108,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         final TextView tv_limit_value_chgble = findViewById(R.id.limit_value_chgble);
         tv_cur_value_chg = findViewById(R.id.curt_value_chgble);
         final View v_limit_line_chgble = findViewById(R.id.limit_line_chgble);
+        gr_Button=  findViewById(R.id.group_of_btn);
+        parent = findViewById(R.id.parentView);
 
         Log.d(TAG,"onCreate is called");
         audioRecorder = new MyMediaRecorder();
@@ -138,17 +144,22 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                         Ys.add(v_limit_line_chgble.getY());
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        v_limit_line_chgble.animate()
-                                .y(event.getRawY() + dY)
-                                .setDuration(0)
-                                .start();
-                        tv_limit_value_chgble.animate()
-                            .y(event.getRawY() + dY - 50)
-                            .setDuration(0)
-                            .start();
-                        Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
-                        Ys.add(event.getRawY() + dY);
-                        tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 32 + tv_status.getHeight()
+                        && v_limit_line_chgble.getY() < parent.getHeight() - 16){
+                            v_limit_line_chgble.animate()
+                                    .y(event.getRawY() + dY)
+                                    .setDuration(0)
+                                    .start();
+                            tv_limit_value_chgble.animate()
+                                    .y(event.getRawY() + dY - 50)
+                                    .setDuration(0)
+                                    .start();
+                            Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
+                            Log.d("Yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
+                            Ys.add(event.getRawY() + dY);
+                            tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+                        }
+
                         break;
                     case MotionEvent.ACTION_UP:
                         v_limit_line_chgble.animate()
