@@ -1,6 +1,7 @@
 package com.example.babysitter;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -16,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     Button btn_start;
     TextView tv_status;
     View v_limit_line;
+    View v_limit_line_chgble;
     float dY;
     float  Y0=0, Yc ;
     List<Float> Ys;
@@ -111,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         final TextView tv_limit_value = findViewById(R.id.limit_value);
         final TextView tv_limit_value_chgble = findViewById(R.id.limit_value_chgble);
         tv_cur_value_chg = findViewById(R.id.curt_value_chgble);
-        final View v_limit_line_chgble = findViewById(R.id.limit_line_chgble);
+        v_limit_line_chgble = findViewById(R.id.limit_line_chgble);
         gr_Button=  findViewById(R.id.group_of_btn);
         parent = findViewById(R.id.parentView);
 
@@ -138,14 +141,15 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                         v_limit_line_chgble.setVisibility(View.VISIBLE);
                         tv_limit_value_chgble.setVisibility(View.VISIBLE);
                         dY = v_limit_line_chgble.getY() - event.getRawY();
-                        Log.d("Yoyo", "dY = " + dY);
-                        Log.d("Yoyo", "Y = " + v.getY());
-                        Log.d("Yoyo", "rawY = " + event.getRawY());
+                        Log.d("haha", "dY = " + dY);
+                        Log.d("haha", "Y = " + v.getY());
+                        Log.d("haha", "rawY = " + event.getRawY());
                         Ys.add(v_limit_line_chgble.getY());
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 32 + tv_status.getHeight()
-                        && v_limit_line_chgble.getY() < parent.getHeight() - 16){
+                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 102 + tv_status.getHeight()
+                        && v_limit_line_chgble.getY() < parent.getHeight() - 82){
+                            v_limit_line_chgble.setVisibility(View.VISIBLE);
                             v_limit_line_chgble.animate()
                                     .y(event.getRawY() + dY)
                                     .setDuration(0)
@@ -158,6 +162,16 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                             Log.d("Yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
                             Ys.add(event.getRawY() + dY);
                             tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+                        }else{
+                            v_limit_line_chgble.setVisibility(View.INVISIBLE);
+                            v_limit_line_chgble.animate()
+                                    .y(event.getRawY() + dY)
+                                    .setDuration(0)
+                                    .start();
+                            tv_limit_value_chgble.animate()
+                                    .y(event.getRawY() + dY - 50)
+                                    .setDuration(0)
+                                    .start();
                         }
 
                         break;
@@ -317,6 +331,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         else{
             Log.d(TAG,"initChart is null init chart");
             mChart = findViewById(R.id.bar_chart);
+            mChart.setOnChartGestureListener(this);
+            Log.d("haha", "sdfsdfs");
             setupChart();
             setupAxes();
 
@@ -329,15 +345,53 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         // disable description text
         mChart.getDescription().setEnabled(false);
         // enable touch gestures
-        mChart.setTouchEnabled(false);
+        mChart.setTouchEnabled(true);
+        mChart.setDragDecelerationEnabled(true);
+        mChart.setDragYEnabled(true);
         // if disabled, scaling can be done on x- and y-axis separately
-        mChart.setPinchZoom(true);
+        mChart.setPinchZoom(false);
         // enable scaling
         mChart.setScaleEnabled(false);
         mChart.setDrawGridBackground(false);
         // set an alternative background color
 //        mChart.setBackgroundColor(Color.DKGRAY);
     }
+
+//    private void addCustomLayoutOnLimitLine(final double lastValue) {
+//
+//        mChart.post(new Runnable() { //check location when view is created
+//            public void run() {
+//                int[] chartLocationOnScreen = new int[2];
+//                mChart.getLocationOnScreen(chartLocationOnScreen);
+//
+//                int x = chartLocationOnScreen[0];
+//                int y = chartLocationOnScreen[1];
+//
+//                int width = mChart.getWidth();
+//                int height = mChart.getHeight();
+//
+//
+//                double max = mChart.getYMax();
+//                double min = mChart.getYMin();
+//
+//                int limitXPoint = x + width;
+//                int limitYPoint = (int) ((((max - lastValue) * height) / (max + min))+ y);
+//
+//
+//
+//                LayoutInflater inflater = (LayoutInflater)   getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//                RelativeLayout rlValue = (RelativeLayout) inflater.inflate(R.layout.item_chart_value, null);
+//                TextView tvValue = (TextView) rlValue.findViewById(R.id.tv_value);
+//                tvValue.setText(String.valueOf(lastValue));
+//
+//                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(50, 50);
+//                params.leftMargin = limitXPoint - 100;
+//                params.topMargin = limitYPoint;
+//                mChart.addView(rlValue, params); //this doesn't seem to be working
+//                rlValue.bringToFront();
+//            }
+//        });
+//    }
 
     private void setupAxes() {
         ValueFormatter xAxisFormatter = new ValueFormatter() {
@@ -348,6 +402,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         };
 
         XAxis xAxis = mChart.getXAxis();
+        xAxis.setEnabled(false);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawAxisLine(false);
         xAxis.setDrawGridLines(false);
@@ -360,20 +415,18 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 //        xl.setEnabled(true);
 
         YAxis leftAxis = mChart.getAxisLeft();
-
-
 //        leftAxis.setTextColor(Color.WHITE);
-
         leftAxis.setAxisMinimum(0f);
+        leftAxis.setEnabled(false);
 //        leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = mChart.getAxisRight();
         rightAxis.setEnabled(false);
 
 //         Add a limit line
-        LimitLine ll = new LimitLine(1500, "Upper Limit");
-        leftAxis.setAxisMaximum(ll.getLimit()*1.43f);
-        ll.setLineWidth(2f);
+        LimitLine ll = new LimitLine(8000, "Upper Limit");
+        leftAxis.setAxisMaximum(ll.getLimit()*1f);
+        ll.setLineWidth(3f);
         ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         ll.setTextSize(10f);
         ll.setLineColor(Color.GREEN);
@@ -494,7 +547,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 
     @Override
     public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
-
+        Log.d("haha", "Yyyyy = " + me.getRawY());
+        Log.d("haha", "xxxx= ");
     }
 
     @Override
@@ -529,6 +583,58 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 
     @Override
     public void onChartTranslate(MotionEvent me, float dX, float dY) {
+
+        Log.d("haha", "dY = ");
+        Log.d("haha", "rawY = ");
+
+//        switch(me.getAction()){
+//            case MotionEvent.ACTION_DOWN:
+//
+//                break;
+////            case MotionEvent.ACTION_MOVE:
+////                if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 102 + tv_status.getHeight()
+////                        && v_limit_line_chgble.getY() < parent.getHeight() - 82){
+////                    v_limit_line_chgble.setVisibility(View.VISIBLE);
+////                    v_limit_line_chgble.animate()
+////                            .y(event.getRawY() + dY)
+////                            .setDuration(0)
+////                            .start();
+////                    tv_limit_value_chgble.animate()
+////                            .y(event.getRawY() + dY - 50)
+////                            .setDuration(0)
+////                            .start();
+////                    Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
+////                    Log.d("Yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
+////                    Ys.add(event.getRawY() + dY);
+////                    tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+////                }else{
+////                    v_limit_line_chgble.setVisibility(View.INVISIBLE);
+////                    v_limit_line_chgble.animate()
+////                            .y(event.getRawY() + dY)
+////                            .setDuration(0)
+////                            .start();
+////                    tv_limit_value_chgble.animate()
+////                            .y(event.getRawY() + dY - 50)
+////                            .setDuration(0)
+////                            .start();
+////                }
+////
+////                Log.d("haha", )
+////
+////                break;
+////            case MotionEvent.ACTION_UP:
+////                v_limit_line_chgble.animate()
+////                        .y(Ys.get(0))
+////                        .setDuration(0)
+////                        .start();
+////                v_limit_line_chgble.setVisibility(View.INVISIBLE);
+////                tv_limit_value_chgble.setVisibility(View.INVISIBLE);
+////                tv_limit_value.setText(tv_limit_value_chgble.getText());
+////
+////
+////                Ys.clear();
+//            default:
+//        }
 
     }
 }
