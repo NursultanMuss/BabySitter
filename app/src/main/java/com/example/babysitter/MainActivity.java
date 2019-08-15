@@ -47,6 +47,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.utils.FileUtils;
+import com.github.mikephil.charting.utils.MPPointD;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,9 +71,12 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     Button btn_stop;
     Button btn_start;
     TextView tv_status;
+    View v_limit_line_big;
     View v_limit_line;
     View v_limit_line_chgble;
-    float dY;
+    TextView tv_limit_value_chgble;
+    TextView tv_limit_value;
+    float dY, dX;
     float  Y0=0, Yc ;
     List<Float> Ys;
     List<Integer> yy = new ArrayList<>();
@@ -110,9 +114,9 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         btn_stop = findViewById(R.id.btn_stop);
         tv_status = findViewById(R.id.tv_status);
         v_limit_line = findViewById(R.id.limit_line_view);
-        View v_limit_line_big = findViewById(R.id.limit_line_big);
-        final TextView tv_limit_value = findViewById(R.id.limit_value);
-        final TextView tv_limit_value_chgble = findViewById(R.id.limit_value_chgble);
+        v_limit_line_big = findViewById(R.id.limit_line_big);
+        tv_limit_value = findViewById(R.id.limit_value);
+        tv_limit_value_chgble = findViewById(R.id.limit_value_chgble);
         tv_cur_value_chg = findViewById(R.id.curt_value_chgble);
         v_limit_line_chgble = findViewById(R.id.limit_line_chgble);
         gr_Button=  findViewById(R.id.group_of_btn);
@@ -132,6 +136,13 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         }
 
 
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initChart();
         v_limit_line_big.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -141,14 +152,17 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                         v_limit_line_chgble.setVisibility(View.VISIBLE);
                         tv_limit_value_chgble.setVisibility(View.VISIBLE);
                         dY = v_limit_line_chgble.getY() - event.getRawY();
+                        dX = v_limit_line_chgble.getX() - event.getRawX();
+                        float Y = v_limit_line_chgble.getY();
                         Log.d("haha", "dY = " + dY);
                         Log.d("haha", "Y = " + v.getY());
                         Log.d("haha", "rawY = " + event.getRawY());
                         Ys.add(v_limit_line_chgble.getY());
+
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 102 + tv_status.getHeight()
-                        && v_limit_line_chgble.getY() < parent.getHeight() - 82){
+//                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 102 + tv_status.getHeight()
+//                                && v_limit_line_chgble.getY() < parent.getHeight() - 82){
                             v_limit_line_chgble.setVisibility(View.VISIBLE);
                             v_limit_line_chgble.animate()
                                     .y(event.getRawY() + dY)
@@ -161,18 +175,21 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                             Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
                             Log.d("Yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
                             Ys.add(event.getRawY() + dY);
+                            MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(event.getRawX() + dX,event.getRawY() + dY);
+                            double YValue = point.y;
+                            Log.d("haha", "yValue = " + YValue);
                             tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
-                        }else{
-                            v_limit_line_chgble.setVisibility(View.INVISIBLE);
-                            v_limit_line_chgble.animate()
-                                    .y(event.getRawY() + dY)
-                                    .setDuration(0)
-                                    .start();
-                            tv_limit_value_chgble.animate()
-                                    .y(event.getRawY() + dY - 50)
-                                    .setDuration(0)
-                                    .start();
-                        }
+//                        }else{
+//                            v_limit_line_chgble.setVisibility(View.INVISIBLE);
+//                            v_limit_line_chgble.animate()
+//                                    .y(event.getRawY() + dY)
+//                                    .setDuration(0)
+//                                    .start();
+//                            tv_limit_value_chgble.animate()
+//                                    .y(event.getRawY() + dY - 50)
+//                                    .setDuration(0)
+//                                    .start();
+//                        }
 
                         break;
                     case MotionEvent.ACTION_UP:
@@ -194,12 +211,6 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
                 return true;
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
 
     }
 
@@ -331,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         else{
             Log.d(TAG,"initChart is null init chart");
             mChart = findViewById(R.id.bar_chart);
-            mChart.setOnChartGestureListener(this);
+//            mChart.setOnChartGestureListener(this);
             Log.d("haha", "sdfsdfs");
             setupChart();
             setupAxes();
@@ -345,7 +356,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         // disable description text
         mChart.getDescription().setEnabled(false);
         // enable touch gestures
-        mChart.setTouchEnabled(true);
+        mChart.setTouchEnabled(false);
         mChart.setDragDecelerationEnabled(true);
         mChart.setDragYEnabled(true);
         // if disabled, scaling can be done on x- and y-axis separately
@@ -424,8 +435,8 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         rightAxis.setEnabled(false);
 
 //         Add a limit line
-        LimitLine ll = new LimitLine(8000, "Upper Limit");
-        leftAxis.setAxisMaximum(ll.getLimit()*1f);
+        LimitLine ll = new LimitLine(4000, "Upper Limit");
+        leftAxis.setAxisMaximum(ll.getLimit()*1.43f);
         ll.setLineWidth(3f);
         ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         ll.setTextSize(10f);
@@ -433,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         ll.setTextColor(Color.BLUE);
 
         // reset all limit lines to avoid overlapping lines
-        leftAxis.removeAllLimitLines();
+
         leftAxis.addLimitLine(ll);
         // limit lines are drawn behind data (and not on top)
 //        leftAxis.setDrawLimitLinesBehindData(true);
