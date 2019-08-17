@@ -64,7 +64,11 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     TextView tv_cur_value_chg;
     private boolean bListener = true; // для проверки записи звука
     boolean stoped=false;  // для кнопки stop
+
     private BarChart mChart;
+    private LimitLine ll;
+    private YAxis leftAxis;
+
     long savedTime=0;
     private boolean isChart;
     ArrayList<BarEntry> yVals;
@@ -78,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     TextView tv_limit_value;
     float dY, dX;
     float  Y0=0, Yc ;
+    double YValue;
     List<Float> Ys;
     List<Integer> yy = new ArrayList<>();
     RelativeLayout gr_Button;
@@ -106,6 +111,166 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     };
 
 
+    @Override
+    public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+        MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(me.getX(),me.getY());
+        YValue = point.y;
+//        double XValue = point.x;
+//        v_limit_line_chgble.setVisibility(View.VISIBLE);
+//        tv_limit_value_chgble.setVisibility(View.VISIBLE);
+//        dY = v_limit_line_chgble.getY() - me.getRawY();
+//        float Y = v_limit_line_chgble.getY();
+//        Ys.add(v_limit_line_chgble.getY());
+//
+        Log.d("haha", "Y0 = " + YValue);
+//        Log.d("haha", "X0= " + XValue);
+    }
+
+    @Override
+    public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
+
+        MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(me.getX(),me.getY());
+        YValue = point.y;
+        leftAxis.removeAllLimitLines();
+        LimitLine limitLineNew = new LimitLine((int)YValue);
+        limitLineNew.setLineColor(Color.BLUE);
+        leftAxis.setAxisMaximum(limitLineNew.getLimit() * 1.43f);
+        leftAxis.addLimitLine(limitLineNew);
+        limitLineNew.setLineWidth(25f);
+        mChart.invalidate();
+//        double XValue = point.x;
+//        v_limit_line_chgble.animate()
+//                .y(me.getRawY() + dY)
+//                .setDuration(0)
+//                .start();
+//        tv_limit_value_chgble.animate()
+//                .y(me.getRawY() + dY - 50)
+//                .setDuration(0)
+//                .start();
+//        v_limit_line_chgble.setVisibility(View.INVISIBLE);
+//        tv_limit_value_chgble.setVisibility(View.INVISIBLE);
+//        tv_limit_value.setText(tv_limit_value_chgble.getText());
+//
+//
+//        Ys.clear();
+
+
+//        tv_status.setText(String.valueOf(YValue));
+
+        Log.d("haha", "Y value = " + YValue);
+        Log.d("haha", "Y = " + me.getY());
+//        Log.d("haha", "X1= " + XValue);
+    }
+
+    @Override
+    public void onChartLongPressed(MotionEvent me) {
+
+        MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(me.getX(),me.getY());
+        YValue = point.y;
+        v_limit_line_chgble.setVisibility(View.VISIBLE);
+        v_limit_line_chgble.animate().y(me.getY()).setDuration(0).start();
+        Log.d("haha", "Y1 = " + YValue);
+
+//        v_limit_line_chgble.animate().y(me.getRawY() + dY)
+//                .setDuration(0)
+//                .start();
+//        tv_limit_value_chgble.animate()
+//                .y(me.getRawY() + dY - 50)
+//                .setDuration(0)
+//                .start();
+//        Ys.add(me.getRawY() + dY);
+//        tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+    }
+
+    @Override
+    public void onChartDoubleTapped(MotionEvent me) {
+
+    }
+
+    @Override
+    public void onChartSingleTapped(MotionEvent me) {
+
+    }
+
+    @Override
+    public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
+//        v_limit_line_chgble.setVisibility(View.VISIBLE);
+//        v_limit_line_chgble.animate().y(me.getY()).setDuration(0).start();
+        Log.d("haha", "Fling = " + velocityY + "   " + me2.getY());
+
+    }
+
+    @Override
+    public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
+
+    }
+
+    @Override
+    public void onChartTranslate(MotionEvent me, float dX, float dY) {
+        Ys.add(dY);
+        v_limit_line_chgble.setVisibility(View.VISIBLE);
+        v_limit_line_chgble.animate()
+                .y(dY)
+                .setDuration(0)
+                .start();
+        tv_limit_value_chgble.animate()
+                .y(dY - 50)
+                .setDuration(0)
+                .start();
+        Log.d("haha", "Translate = " + dY + "   " + me.getY());
+//        Log.d("haha", "dY = ");
+//        Log.d("haha", "rawY = ");
+
+//        switch(me.getAction()){
+//            case MotionEvent.ACTION_DOWN:
+//
+//                break;
+//            case MotionEvent.ACTION_MOVE:
+//                if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 102 + tv_status.getHeight()
+//                        && v_limit_line_chgble.getY() < parent.getHeight() - 82){
+//                    v_limit_line_chgble.setVisibility(View.VISIBLE);
+//                    v_limit_line_chgble.animate()
+//                            .y(event.getRawY() + dY)
+//                            .setDuration(0)
+//                            .start();
+//                    tv_limit_value_chgble.animate()
+//                            .y(event.getRawY() + dY - 50)
+//                            .setDuration(0)
+//                            .start();
+//                    Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
+//                    Log.d("Yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
+//                    Ys.add(event.getRawY() + dY);
+//                    tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+//                }else{
+//                    v_limit_line_chgble.setVisibility(View.INVISIBLE);
+//                    v_limit_line_chgble.animate()
+//                            .y(event.getRawY() + dY)
+//                            .setDuration(0)
+//                            .start();
+//                    tv_limit_value_chgble.animate()
+//                            .y(event.getRawY() + dY - 50)
+//                            .setDuration(0)
+//                            .start();
+//                }
+//
+//                Log.d("haha", )
+//
+//                break;
+//            case MotionEvent.ACTION_UP:
+//                v_limit_line_chgble.animate()
+//                        .y(Ys.get(0))
+//                        .setDuration(0)
+//                        .start();
+//                v_limit_line_chgble.setVisibility(View.INVISIBLE);
+//                tv_limit_value_chgble.setVisibility(View.INVISIBLE);
+//                tv_limit_value.setText(tv_limit_value_chgble.getText());
+//
+//
+//                Ys.clear();
+//            default:
+//        }
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,42 +308,40 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
     protected void onResume() {
         super.onResume();
         initChart();
-        v_limit_line_big.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch(event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        v_limit_line_chgble.setVisibility(View.VISIBLE);
-                        tv_limit_value_chgble.setVisibility(View.VISIBLE);
-                        dY = v_limit_line_chgble.getY() - event.getRawY();
-                        dX = v_limit_line_chgble.getX() - event.getRawX();
-                        float Y = v_limit_line_chgble.getY();
-                        Log.d("haha", "dY = " + dY);
-                        Log.d("haha", "Y = " + v.getY());
-                        Log.d("haha", "rawY = " + event.getRawY());
-                        Ys.add(v_limit_line_chgble.getY());
-
-                        break;
-                    case MotionEvent.ACTION_MOVE:
+//        v_limit_line_big.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//
+//                switch(event.getAction()){
+//                    case MotionEvent.ACTION_DOWN:
+//                        v_limit_line_chgble.setVisibility(View.VISIBLE);
+//                        tv_limit_value_chgble.setVisibility(View.VISIBLE);
+//                        dY = v_limit_line_chgble.getY() - event.getRawY();
+//                        dX = v_limit_line_chgble.getX() - event.getRawX();
+//                        float Y = v_limit_line_chgble.getY();
+//                        Log.d("yoyo", "dY = " + dY);
+//                        Log.d("yoyo", "Y = " + v.getY());
+//                        Log.d("yoyo", "rawY = " + event.getRawY());
+//                        Ys.add(v_limit_line_chgble.getY());
+//
+//                        break;
+//                    case MotionEvent.ACTION_MOVE:
 //                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 102 + tv_status.getHeight()
 //                                && v_limit_line_chgble.getY() < parent.getHeight() - 82){
-                            v_limit_line_chgble.setVisibility(View.VISIBLE);
-                            v_limit_line_chgble.animate()
-                                    .y(event.getRawY() + dY)
-                                    .setDuration(0)
-                                    .start();
-                            tv_limit_value_chgble.animate()
-                                    .y(event.getRawY() + dY - 50)
-                                    .setDuration(0)
-                                    .start();
-                            Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
-                            Log.d("Yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
-                            Ys.add(event.getRawY() + dY);
-                            MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(event.getRawX() + dX,event.getRawY() + dY);
-                            double YValue = point.y;
-                            Log.d("haha", "yValue = " + YValue);
-                            tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
+//                            v_limit_line_chgble.setVisibility(View.VISIBLE);
+//                            v_limit_line_chgble.animate()
+//                                    .y(event.getRawY() + dY)
+//                                    .setDuration(0)
+//                                    .start();
+//                            tv_limit_value_chgble.animate()
+//                                    .y(event.getRawY() + dY - 50)
+//                                    .setDuration(0)
+//                                    .start();
+//                            Log.d("yoyo", "animation Y = " + (event.getRawY() + dY));
+//                            Log.d("yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
+//                            Ys.add(event.getRawY() + dY);
+//                            Log.d("Yvalue", "yValue = " + YValue);
+//                            tv_limit_value_chgble.setText(String.valueOf(YValue));
 //                        }else{
 //                            v_limit_line_chgble.setVisibility(View.INVISIBLE);
 //                            v_limit_line_chgble.animate()
@@ -190,27 +353,28 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 //                                    .setDuration(0)
 //                                    .start();
 //                        }
-
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        v_limit_line_chgble.animate()
-                                .y(Ys.get(0))
-                                .setDuration(0)
-                                .start();
-                        v_limit_line_chgble.setVisibility(View.INVISIBLE);
-                        tv_limit_value_chgble.setVisibility(View.INVISIBLE);
-                        tv_limit_value.setText(tv_limit_value_chgble.getText());
-
-
-                        Ys.clear();
-                    default:
-                        return false;
-                }
-
-
-                return true;
-            }
-        });
+//
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        v_limit_line_chgble.animate()
+//                                .y(Ys.get(0))
+//                                .setDuration(0)
+//                                .start();
+//                        v_limit_line_chgble.setVisibility(View.INVISIBLE);
+//                        tv_limit_value_chgble.setVisibility(View.INVISIBLE);
+//                        tv_limit_value.setText(tv_limit_value_chgble.getText());
+//
+//                        Log.d("haha" , "Y view = " + (event.getRawY() + dY ));
+//                        Ys.clear();
+//                    default:
+//                        return false;
+//
+//                }
+//
+//
+//                return true;
+//            }
+//        });
 
     }
 
@@ -342,7 +506,7 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         else{
             Log.d(TAG,"initChart is null init chart");
             mChart = findViewById(R.id.bar_chart);
-//            mChart.setOnChartGestureListener(this);
+            mChart.setOnChartGestureListener(this);
             Log.d("haha", "sdfsdfs");
             setupChart();
             setupAxes();
@@ -356,13 +520,13 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         // disable description text
         mChart.getDescription().setEnabled(false);
         // enable touch gestures
-        mChart.setTouchEnabled(false);
-        mChart.setDragDecelerationEnabled(true);
-        mChart.setDragYEnabled(true);
+        mChart.setTouchEnabled(true);
+        mChart.setDragDecelerationEnabled(false);
+        mChart.setDragEnabled(true);
         // if disabled, scaling can be done on x- and y-axis separately
         mChart.setPinchZoom(false);
         // enable scaling
-        mChart.setScaleEnabled(false);
+        mChart.setScaleEnabled(true);
         mChart.setDrawGridBackground(false);
         // set an alternative background color
 //        mChart.setBackgroundColor(Color.DKGRAY);
@@ -413,9 +577,9 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
         };
 
         XAxis xAxis = mChart.getXAxis();
-        xAxis.setEnabled(false);
+        xAxis.setEnabled(true);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setDrawAxisLine(false);
+        xAxis.setDrawAxisLine(true);
         xAxis.setDrawGridLines(false);
 
 //        xAxis.setValueFormatter(new IndexAxisValueFormatter());
@@ -425,19 +589,19 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 //        xl.setAvoidFirstLastClipping(true);
 //        xl.setEnabled(true);
 
-        YAxis leftAxis = mChart.getAxisLeft();
+        leftAxis = mChart.getAxisLeft();
 //        leftAxis.setTextColor(Color.WHITE);
         leftAxis.setAxisMinimum(0f);
-        leftAxis.setEnabled(false);
+        leftAxis.setEnabled(true);
 //        leftAxis.setDrawGridLines(true);
 
         YAxis rightAxis = mChart.getAxisRight();
         rightAxis.setEnabled(false);
 
 //         Add a limit line
-        LimitLine ll = new LimitLine(4000, "Upper Limit");
+        ll = new LimitLine(800, "Upper Limit");
         leftAxis.setAxisMaximum(ll.getLimit()*1.43f);
-        ll.setLineWidth(3f);
+        ll.setLineWidth(25f);
         ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
         ll.setTextSize(10f);
         ll.setLineColor(Color.GREEN);
@@ -556,96 +720,5 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 
 
 
-    @Override
-    public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
-        Log.d("haha", "Yyyyy = " + me.getRawY());
-        Log.d("haha", "xxxx= ");
-    }
 
-    @Override
-    public void onChartGestureEnd(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
-
-    }
-
-    @Override
-    public void onChartLongPressed(MotionEvent me) {
-
-    }
-
-    @Override
-    public void onChartDoubleTapped(MotionEvent me) {
-
-    }
-
-    @Override
-    public void onChartSingleTapped(MotionEvent me) {
-
-    }
-
-    @Override
-    public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
-
-    }
-
-    @Override
-    public void onChartScale(MotionEvent me, float scaleX, float scaleY) {
-
-    }
-
-    @Override
-    public void onChartTranslate(MotionEvent me, float dX, float dY) {
-
-        Log.d("haha", "dY = ");
-        Log.d("haha", "rawY = ");
-
-//        switch(me.getAction()){
-//            case MotionEvent.ACTION_DOWN:
-//
-//                break;
-////            case MotionEvent.ACTION_MOVE:
-////                if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight()+ 102 + tv_status.getHeight()
-////                        && v_limit_line_chgble.getY() < parent.getHeight() - 82){
-////                    v_limit_line_chgble.setVisibility(View.VISIBLE);
-////                    v_limit_line_chgble.animate()
-////                            .y(event.getRawY() + dY)
-////                            .setDuration(0)
-////                            .start();
-////                    tv_limit_value_chgble.animate()
-////                            .y(event.getRawY() + dY - 50)
-////                            .setDuration(0)
-////                            .start();
-////                    Log.d("Yoyo", "animation Y = " + (event.getRawY() + dY));
-////                    Log.d("Yoyo", "animation dY = " + (v_limit_line_chgble.getY()));
-////                    Ys.add(event.getRawY() + dY);
-////                    tv_limit_value_chgble.setText(String.valueOf(Ys.get(Ys.size()-1)-Ys.get(0)));
-////                }else{
-////                    v_limit_line_chgble.setVisibility(View.INVISIBLE);
-////                    v_limit_line_chgble.animate()
-////                            .y(event.getRawY() + dY)
-////                            .setDuration(0)
-////                            .start();
-////                    tv_limit_value_chgble.animate()
-////                            .y(event.getRawY() + dY - 50)
-////                            .setDuration(0)
-////                            .start();
-////                }
-////
-////                Log.d("haha", )
-////
-////                break;
-////            case MotionEvent.ACTION_UP:
-////                v_limit_line_chgble.animate()
-////                        .y(Ys.get(0))
-////                        .setDuration(0)
-////                        .start();
-////                v_limit_line_chgble.setVisibility(View.INVISIBLE);
-////                tv_limit_value_chgble.setVisibility(View.INVISIBLE);
-////                tv_limit_value.setText(tv_limit_value_chgble.getText());
-////
-////
-////                Ys.clear();
-//            default:
-//        }
-
-    }
 }
