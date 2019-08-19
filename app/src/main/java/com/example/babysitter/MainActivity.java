@@ -17,6 +17,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -228,6 +229,26 @@ public class MainActivity extends AppCompatActivity implements OnChartGestureLis
 public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture lastPerformedGesture) {
     MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(me.getX(),me.getY());
     YValue = point.y;
+    float posY = (float) mChart.getPixelForValues(0, leftAxis.getLimitLines().get(0).getLimit(),mChart.getAxisLeft().getAxisDependency()).y;
+    if(me.getY() >= posY - 25 && me.getY()<= posY + 25){
+        Log.d("lala", "yes");
+        switch (me.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                v_limit_line_chgble.setVisibility(View.VISIBLE);
+
+                Log.d("lala", "v_limit_line_chgble = " + v_limit_line_chgble.getY() + " me.getY " + me.getY());
+                dY = v_limit_line_chgble.getY() - me.getRawY();
+                Ys.add(v_limit_line_chgble.getY());
+                break;
+            case MotionEvent.ACTION_MOVE:
+                v_limit_line_chgble.animate()
+                        .y(me.getRawY() + dY)
+                        .setDuration(0)
+                        .start();
+                Ys.add(me.getRawY() + dY);
+                break;
+        }
+    }
 //        double XValue = point.x;
 //        v_limit_line_chgble.setVisibility(View.VISIBLE);
 //        tv_limit_value_chgble.setVisibility(View.VISIBLE);
@@ -235,8 +256,8 @@ public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture 
 //        float Y = v_limit_line_chgble.getY();
 //        Ys.add(v_limit_line_chgble.getY());
 //
-    Log.d("haha", "onChartGestureStart" + me.getY());
-    Log.d("haha", "Start, lastGesture: " + lastPerformedGesture);
+    Log.d("haha", "onChartGestureStart" + me.getY() + ". Start, lastGesture: " + lastPerformedGesture + " .Yvalue = " + YValue);
+
 //        Log.d("haha", "X0= " + XValue);
 }
 
@@ -245,16 +266,24 @@ public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture 
 
         MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(me.getX(),me.getY());
         YValue = point.y;
-        leftAxis.removeAllLimitLines();
-        LimitLine limitLineNew = new LimitLine((int)YValue);
-        limitLineNew.setLineColor(Color.BLUE);
-        leftAxis.setAxisMaximum(limitLineNew.getLimit() * 1.43f);
-        leftAxis.addLimitLine(limitLineNew);
-        limitLineNew.setLineWidth(25f);
-        tv_limit_value_chgble.setText(String.valueOf((int)YValue));
-        mChart.invalidate();
-        Log.d("haha", "onChartGestureEnd" + me.getY());
-        Log.d("haha", "END, lastGesture: " + lastPerformedGesture);
+        switch (me.getAction()){
+            case MotionEvent.ACTION_MOVE:
+
+        }
+        v_limit_line_chgble.setVisibility(View.INVISIBLE);
+        Ys.clear();
+
+//        leftAxis.removeAllLimitLines();
+//        LimitLine limitLineNew = new LimitLine((int)YValue);
+//        limitLineNew.setLineColor(Color.BLUE);
+//        leftAxis.setAxisMaximum(limitLineNew.getLimit() * 1.43f);
+//        leftAxis.addLimitLine(limitLineNew);
+//        limitLineNew.setLineWidth(25f);
+//        tv_limit_value_chgble.setText(String.valueOf((int)YValue));
+//        mChart.invalidate();
+
+        Log.d("haha", "onChartGestureEnd" + me.getY() + " "+ "END, lastGesture: " + lastPerformedGesture);
+//        Log.d("haha", );
 
 
 //        double XValue = point.x;
@@ -314,8 +343,9 @@ public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture 
     public void onChartFling(MotionEvent me1, MotionEvent me2, float velocityX, float velocityY) {
 //        v_limit_line_chgble.setVisibility(View.VISIBLE);
 //        v_limit_line_chgble.animate().y(me.getY()).setDuration(0).start();
-        Log.d("haha", "Fling = " + velocityY + "   " + me1.getY() + "   " + me2.getY() + me2.getRawY());
-        v_limit_line_chgble.animate().y(me2.getRawY()).setDuration((long)velocityY).start();
+        Log.d("haha", "Fling = " + velocityY + " Math.abs "+ Math.abs((long)velocityY)+" " + me1.getY() + "   " + me2.getY() + me2.getRawY());
+
+        v_limit_line_chgble.animate().y(me2.getRawY()).setDuration(Math.abs((long)velocityY)).start();
 
     }
 
@@ -390,6 +420,8 @@ public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture 
 //        }
 
     }
+
+
 
     @Override
     protected void onPause() {
@@ -524,58 +556,24 @@ public void onChartGestureStart(MotionEvent me, ChartTouchListener.ChartGesture 
     }
 
     private void setupChart(){
-        mChart.setViewPortOffsets(50, 20, 5, 60);
+        mChart.setViewPortOffsets(100, 0, 5, 20);
         // disable description text
         mChart.getDescription().setEnabled(false);
         // enable touch gestures
         mChart.setTouchEnabled(true);
-        mChart.setDragDecelerationEnabled(false);
         mChart.setDragEnabled(true);
+        mChart.setDragDecelerationEnabled(false);
         mChart.setHighlightPerDragEnabled(true);
         // if disabled, scaling can be done on x- and y-axis separately
         mChart.setPinchZoom(false);
         // enable scaling
-        mChart.setScaleEnabled(true);
-        mChart.setDrawGridBackground(true);
+        mChart.setScaleEnabled(false);
+        mChart.setDrawGridBackground(false);
         // set an alternative background color
 //        mChart.setBackgroundColor(Color.DKGRAY);
     }
 
-//    private void addCustomLayoutOnLimitLine(final double lastValue) {
-//
-//        mChart.post(new Runnable() { //check location when view is created
-//            public void run() {
-//                int[] chartLocationOnScreen = new int[2];
-//                mChart.getLocationOnScreen(chartLocationOnScreen);
-//
-//                int x = chartLocationOnScreen[0];
-//                int y = chartLocationOnScreen[1];
-//
-//                int width = mChart.getWidth();
-//                int height = mChart.getHeight();
-//
-//
-//                double max = mChart.getYMax();
-//                double min = mChart.getYMin();
-//
-//                int limitXPoint = x + width;
-//                int limitYPoint = (int) ((((max - lastValue) * height) / (max + min))+ y);
-//
-//
-//
-//                LayoutInflater inflater = (LayoutInflater)   getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                RelativeLayout rlValue = (RelativeLayout) inflater.inflate(R.layout.item_chart_value, null);
-//                TextView tvValue = (TextView) rlValue.findViewById(R.id.tv_value);
-//                tvValue.setText(String.valueOf(lastValue));
-//
-//                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(50, 50);
-//                params.leftMargin = limitXPoint - 100;
-//                params.topMargin = limitYPoint;
-//                mChart.addView(rlValue, params); //this doesn't seem to be working
-//                rlValue.bringToFront();
-//            }
-//        });
-//    }
+
 
     private void setupAxes() {
         ValueFormatter xAxisFormatter = new ValueFormatter() {
