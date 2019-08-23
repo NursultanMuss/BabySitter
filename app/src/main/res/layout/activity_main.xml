@@ -85,7 +85,7 @@
         android:layout_marginRight="24dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/bar_chart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -113,7 +113,7 @@
         android:background="@android:color/holo_red_dark"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -159,7 +159,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/bar_chart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_status"
+        app:layout_constraintTop_toTopOf="@id/tv_status"
         app:layout_constraintVertical_bias="0.3" />
 
 
