@@ -77,7 +77,7 @@
 
     <View
         android:id="@+id/limit_line_big"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
@@ -85,7 +85,7 @@
         android:layout_marginRight="24dp"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/bar_chart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +104,7 @@
 
     <View
         android:id="@+id/limit_line_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="12dp"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
@@ -146,7 +146,7 @@
 
     <View
         android:id="@+id/limit_line_chgble"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="9dp"
         android:layout_marginStart="24dp"
         android:layout_marginLeft="24dp"
@@ -155,11 +155,11 @@
         android:background="@android:color/holo_red_light"
         android:paddingLeft="30dp"
         android:paddingRight="30dp"
-        android:visibility="invisible"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/bar_chart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/tv_status"
+        app:layout_constraintTop_toTopOf="@id/bar_chart"
         app:layout_constraintVertical_bias="0.3" />
 
 
