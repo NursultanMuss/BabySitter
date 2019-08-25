@@ -11,4 +11,9 @@
     <string name="permissions_explanations">Это разрешение нужно для записи аудио.</string>
     <string name="permissions_granted">PERMISSIONS IS GRANTED!</string>
     <string name="permissions_denied">PERMISSIONS IS GRANTED!</string>
+    <string name="action_settings">Настройки</string>
+    <string name="pref_phone_number">Введите номер телефона</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

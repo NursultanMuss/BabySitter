@@ -23,6 +23,9 @@ import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -91,6 +94,10 @@ public class MainActivity extends AppCompatActivity  {
     double YValue;
     List<Float> Ys;
     List<Integer> yy = new ArrayList<>();
+
+    int alarmSoundLevel= 0;
+    List<Long> alarmTime= new ArrayList<>();
+    long alarmTimeDiff;
     RelativeLayout gr_Button;
     ConstraintLayout parent;
 
@@ -110,6 +117,31 @@ public class MainActivity extends AppCompatActivity  {
                 }
                 Log.d(TAG,"handler is updateData");
                 tv_cur_value_chg.setText(String.valueOf(soundLevel));
+                if(alarmSoundLevel >4 ){
+                    if(alarmTimeDiff<20) {
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+"87087152129"));
+                    startActivity(intent);
+                        tv_status.setText(String.valueOf(alarmTimeDiff));
+                        Log.d("alarm", "Alarm time is  - "+alarmTimeDiff);
+                        alarmSoundLevel = 0;
+                        alarmTimeDiff = 0;
+                        alarmTime.clear();
+
+                        isThreadRun = false;
+                        bListener = false;
+                        audioRecorder.delete();
+                        Log.d(TAG, "stopClick is called");
+                        thread = null;
+                        isChart = false;
+                        stoped = true;
+
+
+                        yy.clear();
+                    }else{
+                        alarmTimeDiff = 0;
+                        alarmTime.clear();
+                    }
+                }
                 yy.add(soundLevel);
                 updateData(soundLevel,0);
             }
@@ -140,7 +172,8 @@ public class MainActivity extends AppCompatActivity  {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED
                 && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED)
+                == PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE)==PackageManager.PERMISSION_GRANTED)
         {
             Toast.makeText(MainActivity.this,"You have already granted permissions",Toast.LENGTH_SHORT).show();
         }else{
@@ -247,6 +280,22 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_activity_bar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_settings:
+                Intent settings_intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(settings_intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onPause() {
@@ -271,7 +320,8 @@ public class MainActivity extends AppCompatActivity  {
 
     private void requestRecordAudioPermission(){
         if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.RECORD_AUDIO)
-        && ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+        && ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        && ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CALL_PHONE)){
             new AlertDialog.Builder(this)
                     .setTitle("Permissions needed")
                     .setMessage(R.string.permissions_explanations)
@@ -279,7 +329,7 @@ public class MainActivity extends AppCompatActivity  {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             ActivityCompat.requestPermissions(MainActivity.this, new String[]
-                                            {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                                            {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE}
                                     , RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE);
                         }
                     })
@@ -292,7 +342,7 @@ public class MainActivity extends AppCompatActivity  {
                     .create().show();
         }else{
             ActivityCompat.requestPermissions(this, new String[]
-                    {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}
+                    {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CALL_PHONE}
                     , RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE);
         }
     }
@@ -301,7 +351,7 @@ public class MainActivity extends AppCompatActivity  {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                    && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED && grantResults[2] == PackageManager.PERMISSION_GRANTED){
                 Toast.makeText(this, R.string.permissions_granted, Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(this, R.string.permissions_denied, Toast.LENGTH_SHORT);
@@ -318,8 +368,9 @@ public class MainActivity extends AppCompatActivity  {
                         if(bListener){
                             soundLevel = audioRecorder.getMaxAmplitude();
                             if(soundLevel>leftAxis.getLimitLines().get(0).getLimit()){
-                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+"87087152129"));
-                                startActivity(intent);
+                                alarmSoundLevel++;
+                                alarmTime.add(savedTime);
+                                alarmTimeDiff = alarmTime.get(alarmTime.size()-1)-alarmTime.get(0);
                             }
 
                             Log.d(TAG,"started Listening audio");
@@ -448,10 +499,10 @@ public class MainActivity extends AppCompatActivity  {
         // disable description text
         mChart.getDescription().setEnabled(false);
         // enable touch gestures
-        mChart.setTouchEnabled(true);
-        mChart.setDragEnabled(true);
+        mChart.setTouchEnabled(false);
+        mChart.setDragEnabled(false);
         mChart.setDragDecelerationEnabled(false);
-        mChart.setHighlightPerDragEnabled(true);
+        mChart.setHighlightPerDragEnabled(false);
         // if disabled, scaling can be done on x- and y-axis separately
         mChart.setPinchZoom(false);
         // enable scaling
@@ -512,10 +563,6 @@ public class MainActivity extends AppCompatActivity  {
 //    public YAxis.AxisDependency getAxisDependency(){
 //
 //    }
-    public float setYAxisMax(){
-
-        return 10000.0f;
-    }
 
     private void updateData(int val, long time) {
         if(mChart==null){

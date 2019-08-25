@@ -18,5 +18,6 @@
         <item name="colorButtonNormal">@color/colorGreen</item>
         <item name="android:textColor">@color/colorWhite</item>
     </style>
+    <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 
 </resources>
