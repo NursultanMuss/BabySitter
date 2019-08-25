@@ -3,10 +3,12 @@ package com.example.babysitter;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -152,6 +154,8 @@ public class MainActivity extends AppCompatActivity  {
     protected void onResume() {
         super.onResume();
         initChart();
+
+
         v_limit_line_big.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -169,12 +173,13 @@ public class MainActivity extends AppCompatActivity  {
                         Point size = new Point();
                         display.getSize(size);
                         int height = size.y;
+//                        Log.d("ACTION_DOWN", "screenHeight() = " +  height);
                         Ys.add(v_limit_line_chgble.getY());
 
                         break;
                     case MotionEvent.ACTION_MOVE:
-//                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight() + tv_status.getHeight()
-//                                && v_limit_line_chgble.getY() < parent.getHeight() - 20){
+                        if(v_limit_line_chgble.getY() > 0+gr_Button.getHeight() + tv_status.getHeight()
+                                && v_limit_line_chgble.getY() < parent.getHeight() - 40){
                             v_limit_line_chgble.setVisibility(View.VISIBLE);
                             float ChartY = event.getRawY()+dY -gr_Button.getHeight()-72 -tv_status.getHeight();
                             MPPointD point = mChart.getTransformer(YAxis.AxisDependency.LEFT).getValuesByTouchPoint(event.getX(),ChartY);
@@ -192,18 +197,18 @@ public class MainActivity extends AppCompatActivity  {
                             Log.d("ACTION_MOVE", ".y("+(event.getRawY()+dY)+"); "+event.getRawY()+"(event.getRawY())"+dY+"(dY)");
                             Ys.add(event.getRawY() + dY);
                             Log.d("Yvalue", "yValue = " + YValue);
-                            tv_limit_value_chgble.setText(String.valueOf(YValue));
-//                        }else{
-//                            v_limit_line_chgble.setVisibility(View.INVISIBLE);
-//                            v_limit_line_chgble.animate()
-//                                    .y(event.getRawY() + dY)
-//                                    .setDuration(0)
-//                                    .start();
-//                            tv_limit_value_chgble.animate()
-//                                    .y(event.getRawY() + dY - 50)
-//                                    .setDuration(0)
-//                                    .start();
-//                        }
+                            tv_limit_value_chgble.setText(String.valueOf(Math.round(YValue)));
+                        }else{
+                            v_limit_line_chgble.setVisibility(View.INVISIBLE);
+                            v_limit_line_chgble.animate()
+                                    .y(event.getRawY() + dY)
+                                    .setDuration(0)
+                                    .start();
+                            tv_limit_value_chgble.animate()
+                                    .y(event.getRawY() + dY - 50)
+                                    .setDuration(0)
+                                    .start();
+                        }
 
                         break;
                     case MotionEvent.ACTION_UP:
@@ -214,6 +219,18 @@ public class MainActivity extends AppCompatActivity  {
                         v_limit_line_chgble.setVisibility(View.INVISIBLE);
                         tv_limit_value_chgble.setVisibility(View.INVISIBLE);
                         tv_limit_value.setText(tv_limit_value_chgble.getText());
+                        if(YValue>10 && YValue<32500){
+                        leftAxis.removeAllLimitLines();
+                        LimitLine limitLineNew = new LimitLine((int)YValue);
+                        limitLineNew.setLineColor(Color.RED);
+                        leftAxis.setAxisMaximum(limitLineNew.getLimit() * 1.43f);
+                        leftAxis.addLimitLine(limitLineNew);
+                        limitLineNew.setLineWidth(25f);
+                        tv_limit_value_chgble.setText(String.valueOf((int)YValue));
+                        mChart.getData().notifyDataChanged();
+                        mChart.notifyDataSetChanged();
+                        mChart.invalidate();
+                        }
 
                         Log.d("haha" , "Y view = " + (event.getRawY() + dY ));
                         Ys.clear();
@@ -300,6 +317,10 @@ public class MainActivity extends AppCompatActivity  {
                     try{
                         if(bListener){
                             soundLevel = audioRecorder.getMaxAmplitude();
+                            if(soundLevel>leftAxis.getLimitLines().get(0).getLimit()){
+                                Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+"87087152129"));
+                                startActivity(intent);
+                            }
 
                             Log.d(TAG,"started Listening audio");
                             Message message = new Message();
@@ -465,7 +486,7 @@ public class MainActivity extends AppCompatActivity  {
 
         leftAxis = mChart.getAxisLeft();
 //        leftAxis.setTextColor(Color.WHITE);
-        leftAxis.setAxisMinimum(0f);
+        leftAxis.setAxisMinimum(2f);
         leftAxis.setEnabled(true);
 //        leftAxis.setDrawGridLines(true);
 
@@ -473,7 +494,7 @@ public class MainActivity extends AppCompatActivity  {
         rightAxis.setEnabled(false);
 
 //         Add a limit line
-        ll = new LimitLine(800, "Upper Limit");
+        ll = new LimitLine(16000, "Upper Limit");
         leftAxis.setAxisMaximum(ll.getLimit()*1.43f);
         ll.setLineWidth(25f);
         ll.setLabelPosition(LimitLine.LimitLabelPosition.LEFT_TOP);
