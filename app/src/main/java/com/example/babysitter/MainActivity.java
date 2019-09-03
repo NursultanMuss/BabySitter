@@ -63,7 +63,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity   {
 
     private MyMediaRecorder audioRecorder;
     private int RECORD_AUDIO_WRITE_EXTTERNAL_STORAGE_CODE = 1;
@@ -658,8 +658,6 @@ public class MainActivity extends AppCompatActivity  {
         isThreadRun = true;
 
     }
-
-
 
 
 
