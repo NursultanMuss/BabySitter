@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity   {
     RelativeLayout gr_Button;
     ConstraintLayout parent;
 
+    String telNumber;
+
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -119,7 +122,7 @@ public class MainActivity extends AppCompatActivity   {
                 tv_cur_value_chg.setText(String.valueOf(soundLevel));
                 if(alarmSoundLevel >4 ){
                     if(alarmTimeDiff<20) {
-                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+"87087152129"));
+                    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+telNumber));
                     startActivity(intent);
                         tv_status.setText(String.valueOf(alarmTimeDiff));
                         Log.d("alarm", "Alarm time is  - "+alarmTimeDiff);
@@ -179,6 +182,8 @@ public class MainActivity extends AppCompatActivity   {
         }else{
             requestRecordAudioPermission();
         }
+//        SharedPreferences sharedPreferences = getSharedPreferences("settings_pref",MODE_PRIVATE);
+//        telNumber = sharedPreferences.getString("pref_phone_number","");
 
 
     }

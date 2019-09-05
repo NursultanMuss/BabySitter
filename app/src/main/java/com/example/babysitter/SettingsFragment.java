@@ -22,6 +22,7 @@ import java.util.Map;
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
+    public static final String KEY_PREF_PHONE_NUMBER = "pref_phone_number";
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -30,9 +31,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     }
 
-    public void setSummaries(){
-        Preference stylePref = findPreference("pref_phone_number");
-    }
+//    public void setSummaries(){
+//        Preference stylePref = findPreference("pref_phone_number");
+//    }
 
     @Override
     public void onResume() {
@@ -40,12 +41,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         sharedPreferences= getPreferenceManager().getSharedPreferences();
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        Map<String, ?> preferencesMap = sharedPreferences.getAll();
-        for(Map.Entry<String,?> preferenceEntry : preferencesMap.entrySet()){
-            if(preferenceEntry instanceof EditTextPreference){
-                updateSummary((EditTextPreference) preferenceEntry);
-            }
-        }
+//        updateSummary();
+
+//        Map<String, ?> preferencesMap = sharedPreferences.getAll();
+//        for(Map.Entry<String,?> preferenceEntry : preferencesMap.entrySet()){
+//            if(preferenceEntry instanceof EditTextPreference){
+//                updateSummary((EditTextPreference) preferenceEntry);
+//            }
+//        }
     }
 
     @Override
@@ -56,15 +59,25 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Map<String, ?> preferencesMap = sharedPreferences.getAll();
-        Object changedPreference = preferencesMap.get(key);
-        if(preferencesMap.get(key) instanceof EditTextPreference){
-            updateSummary((EditTextPreference) changedPreference);
+//        Map<String, ?> preferencesMap = sharedPreferences.getAll();
+//        Object changedPreference = preferencesMap.get(key);
+//        if(preferencesMap.get(key) instanceof EditTextPreference){
+//            updateSummary((EditTextPreference) changedPreference);
+//        }
+        Preference pref = findPreference(key);
+        if(pref instanceof EditTextPreference){
+            EditTextPreference editTextPreference = (EditTextPreference)pref;
+            pref.setSummary(editTextPreference.getText());
+            Log.d("pref",editTextPreference.getSummary().toString());
         }
     }
 
-    private void updateSummary(EditTextPreference preference){
-        preference.setSummary(preference.getText());
-        Log.d("pref", preference.getText());
-    }
+//    private void updateSummary(){
+//        Preference pref = findPreference(KEY_PREF_PHONE_NUMBER);
+//        if(pref instanceof EditTextPreference){
+//            EditTextPreference editTextPreference = (EditTextPreference)pref;
+//            pref.setSummary(editTextPreference.getText());
+//
+//        };
+//    }
 }

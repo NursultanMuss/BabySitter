@@ -11,7 +11,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
-public class SettingsActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends AppCompatActivity {
     public static final String KEY_PREF_PHONE_NUMBER = "pref_phone_number";
     public String phoneNumber;
     EditTextPreference numberEditText;
@@ -46,12 +46,12 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
 
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(key.equals(KEY_PREF_PHONE_NUMBER)){
-            phoneNumber = sharedPreferences.getString(key,"yoyo");
-
-        }
-
-    }
+//    @Override
+//    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+//        if(key.equals(KEY_PREF_PHONE_NUMBER)){
+//            phoneNumber = sharedPreferences.getString(key,"yoyo");
+//
+//        }
+//
+//    }
 }
