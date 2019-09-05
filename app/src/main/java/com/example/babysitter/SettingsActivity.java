@@ -24,7 +24,7 @@ public class SettingsActivity extends AppCompatActivity implements SharedPrefere
         if(actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        numberEditText = (EditTextPreference) find
+
         getSupportFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <android.support.v7.preference.EditTextPreference
-        android:defaultValue="false"
-        android:inputType="phone"
+    <EditTextPreference
+        android:inputType="text"
         android:key="pref_phone_number"
         android:selectAllOnFocus="true"
         android:singleLine="true"
+        android:summary="This allows you to enter a string"
         android:title="@string/pref_phone_number" />
 </PreferenceScreen>
